@@ -15,7 +15,38 @@ const MINECRAFT_DIR = path.join(os.homedir(), '.craftiumclient');
 const GAME_DIR = path.join(MINECRAFT_DIR, 'game');
 const MODS_DIR = path.join(GAME_DIR, 'mods');
 const CONFIG_PATH = path.join(MINECRAFT_DIR, 'config.json');
-const FABRIC_INSTALLER_URL = `https://meta.fabricmc.net/v2/versions/loader/${MC_VERSION}/${FABRIC_LOADER_VERSION}/0.11.2/server/jar`;
+    const FABRIC_INSTALLER_URL = `https://meta.fabricmc.net/v2/versions/loader/${MC_VERSION}/${FABRIC_LOADER_VERSION}/0.11.2/client/jar
+import { getAuth, signInWithPopup, OAuthProvider } from "firebase/auth";
+import { initializeApp } from "firebase/app";
+
+const firebaseConfig = {
+  apiKey: "YOUR_FIREBASE_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+export async function loginWithMicrosoft() {
+  const provider = new OAuthProvider('microsoft.com');
+  provider.setCustomParameters({
+    prompt: 'consent',
+    tenant: 'consumers'
+  });
+
+  const result = await signInWithPopup(auth, provider);
+  
+  // Microsoft access token (needed for Xbox Live auth)
+  const accessToken = result.credential.accessToken;
+  const refreshToken = result.user.stsTokenManager.refreshToken;
+
+  return { accessToken, refreshToken, user: result.user };
+}
+
 
 // Microsoft mock auth
 function authenticateMicrosoft() {
